@@ -17,8 +17,10 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     age = db.Column(db.Integer)
-    # add: first_name, last_name, country, city (150)
-    city = db.Column(db.String(120))
+    first_name = db.Column(db.String(150))
+    last_name = db.Column(db.String(150))
+    country = db.Column(db.String(150))
+    city = db.Column(db.String(150))
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
 
     def __repr__(self):
