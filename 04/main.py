@@ -106,6 +106,29 @@ def users_delete_by_id(id):
         return redirect(url_for('users'))
 
 
+@app.route("/users/<user_id>/messages/")
+def users_by_id_message(user_id):
+    user = User.query.get_or_404(user_id)
+    data = Message.query.filter_by(user = user).all()
+    return render_template("messages.html", items=data)
+
+
+@app.route("/users/<user_id>/messages/add/", methods=["GET", "POST"])
+def users_by_id_messages_add(user_id):
+    user = User.query.get_or_404(user_id)
+    if request.method == "GET":
+        return render_template("messages-add.html", user=user)
+    if request.method == "POST":
+        item = Message(
+            title=request.form.get("title"),
+            content=request.form.get("content"),
+        )
+        item.user = user
+        db.session.add(item)
+        db.session.commit()
+        return render_template("messages-add.html", info="Message added", user=user)
+
+
 @app.route("/messages/")
 def messages():
     data = Message.query.all()    
@@ -114,8 +137,9 @@ def messages():
 
 @app.route("/messages/add/", methods=["GET", "POST"])
 def messages_add():
+    users = User.query.all()
     if request.method == "GET":
-        return render_template("messages-add.html")
+        return render_template("messages-add.html", users=users)
     if request.method == "POST":
         item = Message(
             title=request.form.get("title"),
@@ -124,10 +148,36 @@ def messages_add():
         )
         db.session.add(item)
         db.session.commit()
-        return render_template("messages-add.html", info="Message added")
+        return render_template("messages-add.html", info="Message added", users=users)
     
 
-# LABORATORIO
-# /messages/1
-# /messages/edit/1
-# /messages/delete/1
+@app.route("/messages/<id>")
+def messages_by_id(id):
+    data = Message.query.get_or_404(id)
+    return render_template("messages-details.html", item=data)
+
+
+@app.route("/messages/edit/<id>", methods=["GET", "POST"])
+def messages_edit_by_id(id):
+    users = User.query.all()
+    data = Message.query.get_or_404(id)
+    if request.method == "GET":
+        return render_template("messages-edit.html", item=data, users=users)
+    if request.method == "POST":
+        data.title = request.form.get("title")
+        data.content = request.form.get("content")
+        data.user_id = request.form.get("user_id")
+        db.session.add(data)
+        db.session.commit()
+        return render_template("messages-edit.html", item=data, info="Message edited", users=users)
+
+
+@app.route("/messages/delete/<id>", methods=["GET", "POST"])
+def messages_delete_by_id(id):
+    data = Message.query.get_or_404(id)
+    if request.method == "GET":
+        return render_template("messages-delete.html", item=data)
+    if request.method == "POST":
+        db.session.delete(data)
+        db.session.commit()
+        return redirect(url_for('messages'))

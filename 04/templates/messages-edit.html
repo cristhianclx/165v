@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block title %}
-<title>Messages add</title>
+<title>Messages edit: {{ item.id }}</title>
 {% endblock %}
 
 {% block content %}
-    <h1>Messages add</h1>
+    <h1>Messages edit: {{ item.id }}</h1>
     <hr>
     <a href="{{ url_for('messages') }}" class="btn btn-info">Return to messages</a>
     <hr>
@@ -18,27 +18,25 @@
     <form method="POST">
         <div class="mb-3">
             <label class="form-label">Title</label>
-            <input type="text" class="form-control" name="title" />
+            <input type="text" class="form-control" name="title" value="{{ item.title }}" />
           </div>
           <div class="mb-3">
             <label class="form-label">Content</label>
-            <textarea id="content" class="form-control" rows="3" name="content"></textarea>
+            <textarea class="form-control" id="content" rows="3" name="content">{{ item.content }}</textarea>
           </div>
-          {% if not user %}
           <div class="mb-3">
             <label class="form-label">User ID</label>
             <select class="form-select" id="user_id" name="user_id" required>
               {% for user in users %}
-              <option value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
+              <option value="{{ user.id }}" {% if user.id == item.user_id %}selected{% endif %}>{{ user.first_name }} {{ user.last_name }}</option>
               {% endfor %}
             </select>
           </div>
-          {% endif %}
         <button type="submit" class="btn btn-primary">Send</button>
       </form>
-    <script>
-      $(document).ready(function() {
-        $('#content').summernote();
-      });
-    </script>
-    {% endblock %}
+      <script>
+        $(document).ready(function() {
+          $('#content').summernote();
+        });
+      </script>
+      {% endblock %}

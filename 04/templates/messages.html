@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-<h1>Users</h1>
+<h1>Messages</h1>
     <hr>
     <a href="{{ url_for('messages_add') }}" class="btn btn-info">Add message</a>
     <hr>
@@ -25,10 +25,14 @@
           <tr>
             <th scope="row">{{ item.id }}</th>
             <td>{{ item.title }}</td>
-            <td>{{ item.content }}</td>
+            <td>{{ item.content|safe }}</td>
             <td>{{ item.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
             <td>{{ item.user.first_name }} {{ item.user.last_name }}</td>
-            <td>-</td>
+            <td>
+              <a href="{{ url_for('messages_by_id', id=item.id) }}" class="btn btn-primary">View</a>
+              <a href="{{ url_for('messages_edit_by_id', id=item.id) }}" class="btn btn-primary">Edit</a>
+              <a href="{{ url_for('messages_delete_by_id', id=item.id) }}" class="btn btn-danger">Delete</a>
+            </td>
           </tr>
           {% endfor %}
         </tbody>

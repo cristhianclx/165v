@@ -57,3 +57,7 @@ flask --app main shell
 >>> item = User.query.get(2)
 >>> db.session.delete(item)
 >>> db.session.commit()
+
+>>> from main import db, User, Message
+>>> user = User.query.get_or_404(1)
+>>> Message.query.filter_by(user = user).all()

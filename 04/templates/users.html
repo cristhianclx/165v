@@ -40,6 +40,8 @@
                 <a href="{{ url_for('users_by_id', id=item.id) }}" class="btn btn-primary">View</a>
                 <a href="{{ url_for('users_edit_by_id', id=item.id) }}" class="btn btn-primary">Edit</a>
                 <a href="{{ url_for('users_delete_by_id', id=item.id) }}" class="btn btn-danger">Delete</a>
+                <a href="{{ url_for('users_by_id_message', user_id=item.id )}}" class="btn btn-info">Messages</a>
+                <a href="{{ url_for('users_by_id_messages_add', user_id=item.id )}}" class="btn btn-info">Add message</a>
             </td>
           </tr>
           {% endfor %}
