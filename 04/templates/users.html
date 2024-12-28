@@ -36,7 +36,9 @@
             {% endif %}
             <td>{{ item.city }}</td>
             <td>{{ item.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
-            <td>-</td>
+            <td>
+                <a href="{{ url_for('users_by_id', id=item.id) }}" class="btn btn-primary">View</a>
+            </td>
           </tr>
           {% endfor %}
         </tbody>

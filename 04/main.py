@@ -73,5 +73,28 @@ def users_add():
         return render_template("users-add.html", info="User added")
     
 
-# /messages/ -> mostrar todos los mensajes
-# /messages/add/ -> agregar un nuevo mensaje
+@app.route("/users/<id>")
+def users_by_id(id):
+    data = User.query.get_or_404(id)
+    return render_template("users-details.html", item=data)
+
+
+@app.route("/messages/")
+def messages():
+    data = Message.query.all()    
+    return render_template("messages.html", items=data)
+
+
+@app.route("/messages/add/", methods=["GET", "POST"])
+def messages_add():
+    if request.method == "GET":
+        return render_template("messages-add.html")
+    if request.method == "POST":
+        item = Message(
+            title=request.form.get("title"),
+            content=request.form.get("content"),
+            user_id=request.form.get("user_id"),
+        )
+        db.session.add(item)
+        db.session.commit()
+        return render_template("messages-add.html", info="Message added")
