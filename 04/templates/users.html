@@ -38,6 +38,8 @@
             <td>{{ item.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
             <td>
                 <a href="{{ url_for('users_by_id', id=item.id) }}" class="btn btn-primary">View</a>
+                <a href="{{ url_for('users_edit_by_id', id=item.id) }}" class="btn btn-primary">Edit</a>
+                <a href="{{ url_for('users_delete_by_id', id=item.id) }}" class="btn btn-danger">Delete</a>
             </td>
           </tr>
           {% endfor %}

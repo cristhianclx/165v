@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Users delete</title>
+{% endblock %}
+
+{% block content %}
+    <h1>Users delete</h1>
+    <hr>
+    <a href="{{ url_for('users') }}" class="btn btn-info">Return to users</a>
+    <hr>
+    <form method="POST">
+      <h2>Are you sure you want to delete User with id {{ item.id }}?</h2>
+        <button type="submit" class="btn btn-danger">Delete</button>
+      </form>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    {% endblock %}
