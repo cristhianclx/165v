@@ -54,15 +54,20 @@ class ExchangeResource(Resource):
 
 
 class GifSearchResource(Resource):
-    def post(self): # 5 gif, ["a", "b", "c"]
+    def post(self):
         search = request.json.get("q")
         data = requests.get("https://api.giphy.com/v1/gifs/search", params = {
-            "api_key": "X83afPN6yM1ApKJeId82IiUP92scDMlM",
+            "api_key": "-",
             "q": search,
             "limit": 5
         })
-        print(data.json())
-        return [] # [ { url: "", title: ""},  { url: "", title: ""}, .. ]
+        gifs = []
+        for gif in data.json().get('data', []):
+            gifs.append({
+                "url": gif["url"],
+                "title": gif["title"]
+            })
+        return gifs
 
 
 api.add_resource(IndexResource, '/')
