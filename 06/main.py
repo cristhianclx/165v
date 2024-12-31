@@ -69,6 +69,24 @@ class Message(db.Model):
         return "<Message: {}>".format(self.id)
 
 
+class MessageSchema(ma.Schema):
+    user = ma.Nested(UserSchema)
+    class Meta:
+        model = Message
+        fields = (
+            "id",
+            "title",
+            "content",
+            "created_at",
+            "user",
+        )
+        datetimeformat = "%Y-%m-%d %H:%M:%S"
+
+
+message_schema = MessageSchema()
+messages_schema = MessageSchema(many = True)
+
+
 class IndexResource(Resource):
     def get(self):
         return {
@@ -116,52 +134,41 @@ class UsersIDResource(Resource):
 
 class MessagesResource(Resource):
     def get(self):
-        data = Message.query.all()
-        items = []
-        for item in data:
-            items.append({
-                "id": item.id,
-                "title": item.title,
-                "content": item.content,
-                "created_at": item.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-                "user": {
-                    "id": item.user.id,
-                    "name": item.user.name,
-                    "age": item.user.age,
-                    "country": item.user.country,
-                    "city": item.user.city,
-                    "address": item.user.address,
-                    "language": item.user.language,
-                }
-            })
-        return items
+        items = Message.query.all()
+        return messages_schema.dump(items)
     
     def post(self):
         data = request.get_json()
         item = Message(**data)
         db.session.add(item)
         db.session.commit()
-        return {
-            "id": item.id,
-            "title": item.title,
-            "content": item.content,
-            "created_at": item.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-            "user": {
-                "id": item.user.id,
-                "name": item.user.name,
-                "age": item.user.age,
-                "country": item.user.country,
-                "city": item.user.city,
-                "address": item.user.address,
-                "language": item.user.language,
-            }
-        }, 201
+        return message_schema.dump(item), 201
+
+
+class MessagesIDResource(Resource):
+    def get(self, id):
+        item = Message.query.get_or_404(id)
+        return message_schema.dump(item)
+    
+    def patch(self, id):
+        item = Message.query.get_or_404(id)
+        data = request.get_json()
+        item.title = data.get("title", item.title)
+        item.content = data.get("content", item.content)
+        item.user_id = data.get("user_id", item.user_id)
+        db.session.add(item)
+        db.session.commit()
+        return message_schema.dump(item)
+
+    def delete(self, id):
+        item = Message.query.get_or_404(id)
+        db.session.delete(item)
+        db.session.commit()
+        return {}, 204
 
 
 api.add_resource(IndexResource, "/")
 api.add_resource(UsersResource, "/users/")
 api.add_resource(UsersIDResource, "/users/<int:id>")
 api.add_resource(MessagesResource, "/messages/")
-
-# LABORATORIO
-# /users/id # GET
+api.add_resource(MessagesIDResource, "/messages/<int:id>")
