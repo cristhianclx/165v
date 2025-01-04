@@ -196,7 +196,16 @@ class UsersIDMessagesResource(Resource):
         return messages_basic_schema.dump(data)
 
     def post(self, user_id):
-        print("-")
+        user = User.query.get_or_404(user_id)
+        data = request.get_json()
+        new_message = Message(
+            user = user,
+            title = data["title"],
+            content = data["content"],
+        )
+        db.session.add(new_message)
+        db.session.commit()
+        return message_schema.dump(new_message), 201
 
 
 api.add_resource(IndexResource, "/")
@@ -206,7 +215,3 @@ api.add_resource(WallResource, "/wall/")
 api.add_resource(MessagesResource, "/messages/")
 api.add_resource(MessagesIDResource, "/messages/<int:id>")
 api.add_resource(UsersIDMessagesResource, "/users/<user_id>/messages/")
-
-
-# LABORATORIO
-# que funcione el POST en /users/<user_id>/messages/
