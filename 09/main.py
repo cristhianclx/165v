@@ -143,10 +143,9 @@ def private():
 @jwt_required()
 def messages():
     current_user = get_jwt_identity()
-    # TODO
-    return []
-
-
-# LABORATORIO
-# /messages/  GET
-# get all messages un usuario, cristhian
+    user = User.query.filter_by(name = current_user).first()
+    if user:
+        items = Message.query.filter_by(user = user)
+        return messages_basic_schema.dump(items)
+    else:
+        return []
