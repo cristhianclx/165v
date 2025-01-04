@@ -6,3 +6,4 @@ flask-migrate
 flask-restful
 flask-restful-swagger-3
 flask-sqlalchemy
+gunicorn[gevent]

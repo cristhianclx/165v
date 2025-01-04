@@ -67,3 +67,7 @@ flask --app main shell
 black file.py --diff
 black file.py
 flake8 file.py
+
+# wsgi
+
+gunicorn -k gevent -w 8 main:app
