@@ -87,6 +87,22 @@ message_schema = MessageSchema()
 messages_schema = MessageSchema(many = True)
 
 
+class MessageBasicSchema(ma.Schema):
+    class Meta:
+        model = Message
+        fields = (
+            "id",
+            "title",
+            "content",
+            "created_at",
+        )
+        datetimeformat = "%Y-%m-%d %H:%M:%S"
+
+
+message_basic_schema = MessageBasicSchema()
+messages_basic_schema = MessageBasicSchema(many = True)
+
+
 class IndexResource(Resource):
     def get(self):
         return {
@@ -167,8 +183,30 @@ class MessagesIDResource(Resource):
         return {}, 204
 
 
+class WallResource(Resource):
+    def get(self):
+        data = Message.query.all() # []
+        return messages_basic_schema.dump(data)
+
+
+class UsersIDMessagesResource(Resource):
+    def get(self, user_id):
+        user = User.query.get_or_404(user_id)
+        data = Message.query.filter_by(user = user).all()
+        return messages_basic_schema.dump(data)
+
+    def post(self, user_id):
+        print("-")
+
+
 api.add_resource(IndexResource, "/")
 api.add_resource(UsersResource, "/users/")
 api.add_resource(UsersIDResource, "/users/<int:id>")
+api.add_resource(WallResource, "/wall/")
 api.add_resource(MessagesResource, "/messages/")
 api.add_resource(MessagesIDResource, "/messages/<int:id>")
+api.add_resource(UsersIDMessagesResource, "/users/<user_id>/messages/")
+
+
+# LABORATORIO
+# que funcione el POST en /users/<user_id>/messages/
