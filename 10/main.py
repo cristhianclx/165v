@@ -24,6 +24,8 @@ class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
+    instructions = db.Column(db.Text, nullable=True)
+    priority = db.Column(db.String(20), nullable=True)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
 
     def __repr__(self):
@@ -36,6 +38,8 @@ class MessageSchema(ma.Schema):
         fields = (
             "id",
             "user",
+            "instructions",
+            "priority",
             "content",
             "created_at",
         )
@@ -72,12 +76,3 @@ def handle_ws_messages(data):
     db.session.commit()
     information = message_schema.dump(item)
     socketio.emit("ws-messages-responses", information)
-
-
-# LABORATORIO
-# model Message, incluir los campos instructions (texto), y el campo priority (low, high)
-# incluir los campos instructions y priority en el html
-# si el campo priority es high de algun modo resaltarlo
-#    <p>
-#    <p style="color: red">
-# html, incluir tambien la fecha

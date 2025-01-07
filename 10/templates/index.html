@@ -17,16 +17,25 @@
         $("#form").on("submit", function(e) {
           let user = $("#user").val();
           let content = $("#content").val();
+          let instructions = $("#instructions").val();
+          let priority = $("#priority").val();
           socket.emit("ws-messages", {
             user: user,
             content: content,
+            instructions: instructions,
+            priority: priority,
           })
           $("#content").val("").focus();
+          $("#instructions").val("").focus();
           e.preventDefault();
         });
       })
       socket.on("ws-messages-responses", function(msg) {
-        $("#messages").append("<p><b>" + msg.user +":</b> " + msg.content +"</p>");
+        if (msg.priority == "high") {
+          $("#messages").append("<p style='color: red;'><b>" + msg.user +":</b> " + msg.content + ", " + msg.instructions + ", <small>" + msg.created_at + "</p>");
+        } else {
+          $("#messages").append("<p><b>" + msg.user +":</b> " + msg.content + ", " + msg.instructions + ", <small>" + msg.created_at + "</p>");
+        }
       })
     </script>
   </head>
@@ -36,13 +45,22 @@
     <form method="POST" id="form">
       <input type="text" class="form-control" placeholder="user" id="user" />
       <input type="text" class="form-control" placeholder="content" id="content" />
+      <input type="text" class="form-control" placeholder="instructions" id="instructions" />
+      <select class="form-select" aria-label="priority" id="priority">
+        <option value="low" selected>low</option>
+        <option value="high">high</option>
+      </select>
       <button type="submit" class="btn btn-primary">Send</button>
     </form>
     <hr>
     <h2>Messages</h2>
     <div id="messages">
       {% for item in items %}
-      <p><b>{{ item.user }}:</b> {{ item.content }}</p>
+        {% if item.priority == "high" %}
+        <p style="color: red;"><b>{{ item.user }}:</b> {{ item.content }}, {{ item.instructions }}, <small>{{ item.created_at }}</small></p>
+        {% else %}
+        <p><b>{{ item.user }}:</b> {{ item.content }}, {{ item.instructions }}, <small>{{ item.created_at }}</small></p>
+        {% endif %}
       {% endfor %}
     </div>
   </body>
