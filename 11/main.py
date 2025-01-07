@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_socketio import SocketIO
@@ -46,6 +46,23 @@ class Message(db.Model):
         return "<Message: {}>".format(self.id)
 
 
+class MessageSchema(ma.Schema):
+    class Meta:
+        model = Message
+        fields = (
+            "id",
+            "user",
+            "content",
+            "priority",
+            "created_at",
+        )
+        datetimeformat = "%Y-%m-%d %H:%M:%S"
+
+
+message_schema = MessageSchema()
+messages_schema = MessageSchema(many = True)
+
+
 @app.route("/status/")
 def status():
     return {
@@ -56,7 +73,24 @@ def status():
 @app.route("/")
 def index():
     data = Room.query.all()
-    return render_template("rooms.html", items=data)
+    new_data = []
+    for i in data:
+        new_data.append({
+            "n": len(Message.query.filter_by(room = i).all()),
+            "data": i,
+        })
+    return render_template("rooms.html", items=new_data)
+
+
+@app.route("/rooms/create/", methods=["GET", "POST"])
+def rooms_create():
+    if request.method == "GET":
+        return render_template("rooms-create.html")
+    if request.method == "POST":
+        item = Room(**request.form)
+        db.session.add(item)
+        db.session.commit()
+        return redirect(url_for('rooms_by_id', id=item.id))
 
 
 @app.route("/rooms/<id>/")
@@ -72,16 +106,6 @@ def handle_ws_messages(data):
     item = Message(**data)
     db.session.add(item)
     db.session.commit()
-    raw = {
-        "user": item.user,
-        "content": item.content,
-        "priority": item.priority,
-    }
+    raw = message_schema.dump(item)
     channel_id = "ws-messages-{}".format(item.room.id)
     socketio.emit(channel_id, raw)
-
-
-# LABORATORIO
-# /rooms/create/ [id, name]
-# / -> incluir el numero de mensajes por canal: Peru (20 mensajes) View
-# incluir marhsmallow, para reemplazar linea 75 
